@@ -184,6 +184,82 @@
         .mock-browser { border-radius: var(--radius-md); }
         .hero { padding: 3rem 1rem 2.5rem; }
     }
+
+    /* ---- Video modal ---- */
+
+    .video-modal {
+        position: fixed;
+        inset: 0;
+        z-index: 500;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1.5rem;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.25s ease, visibility 0.25s ease;
+    }
+
+    .video-modal.is-open {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .video-modal-overlay {
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.78);
+    }
+
+    .video-modal-box {
+        position: relative;
+        width: 100%;
+        max-width: 860px;
+        z-index: 1;
+        transform: scale(0.92);
+        transition: transform 0.25s ease;
+    }
+
+    .video-modal.is-open .video-modal-box {
+        transform: scale(1);
+    }
+
+    .video-modal-close {
+        position: absolute;
+        top: -2.75rem;
+        right: 0;
+        background: none;
+        border: none;
+        color: rgba(255, 255, 255, 0.75);
+        font-size: 1.6rem;
+        line-height: 1;
+        cursor: pointer;
+        padding: 0.25rem 0.4rem;
+        transition: color 0.2s;
+    }
+
+    .video-modal-close:hover { color: #fff; }
+
+    .video-ratio {
+        position: relative;
+        padding-top: 56.25%;
+        border-radius: var(--radius-md);
+        overflow: hidden;
+        background: #000;
+        box-shadow: 0 24px 80px rgba(0, 0, 0, 0.5);
+    }
+
+    .video-ratio iframe {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        border: none;
+    }
+
+    @media (max-width: 600px) {
+        .video-modal-close { top: -2.25rem; font-size: 1.3rem; }
+    }
 </style>
 {% endblock %}
 
@@ -205,7 +281,7 @@
         </p>
         <div class="hero-actions">
             <a href="{{ url_for('register') }}" class="btn-hero">Create free account</a>
-            <a href="#features" class="btn-hero">See how it works</a>
+            <a href="#features" id="videoTrigger" class="btn-hero">See how it works</a>
         </div>
     </div>
     <div class="hero-visual">
@@ -286,4 +362,86 @@
     </div>
 </section>
 
+<div class="video-modal" id="videoModal" role="dialog" aria-modal="true" aria-label="How Spendly works">
+    <div class="video-modal-overlay" id="videoOverlay"></div>
+    <div class="video-modal-box">
+        <button class="video-modal-close" id="videoClose" aria-label="Close video">&#x2715;</button>
+        <div class="video-ratio">
+            <iframe id="videoFrame"
+                    src=""
+                    title="How Spendly works"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowfullscreen></iframe>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function () {
+    var VIDEO_SRC = 'https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&rel=0';
+
+    var modal    = document.getElementById('videoModal');
+    var frame    = document.getElementById('videoFrame');
+    var closeBtn = document.getElementById('videoClose');
+    var overlay  = document.getElementById('videoOverlay');
+    var trigger  = document.getElementById('videoTrigger');
+
+    var prevFocus = null;
+
+    function openModal() {
+        prevFocus = document.activeElement;
+        frame.src = VIDEO_SRC;
+        modal.classList.add('is-open');
+        document.body.style.overflow = 'hidden';
+        closeBtn.focus();
+    }
+
+    function closeModal() {
+        frame.src = '';
+        modal.classList.remove('is-open');
+        document.body.style.overflow = '';
+        if (prevFocus) prevFocus.focus();
+    }
+
+    trigger.addEventListener('click', function (e) {
+        e.preventDefault();
+        openModal();
+    });
+
+    closeBtn.addEventListener('click', closeModal);
+    overlay.addEventListener('click', closeModal);
+
+    document.addEventListener('keydown', function (e) {
+        if (!modal.classList.contains('is-open')) return;
+
+        if (e.key === 'Escape') {
+            closeModal();
+            return;
+        }
+
+        if (e.key === 'Tab') {
+            var focusable = Array.from(modal.querySelectorAll(
+                'button, [href], input, select, textarea, iframe, [tabindex]:not([tabindex="-1"])'
+            ));
+            var first = focusable[0];
+            var last  = focusable[focusable.length - 1];
+
+            if (e.shiftKey) {
+                if (document.activeElement === first) {
+                    e.preventDefault();
+                    last.focus();
+                }
+            } else {
+                if (document.activeElement === last) {
+                    e.preventDefault();
+                    first.focus();
+                }
+            }
+        }
+    });
+}());
+</script>
 {% endblock %}
