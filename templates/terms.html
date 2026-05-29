@@ -5,10 +5,56 @@
 {% block content %}
 <div class="policy-section">
     <h1 class="policy-title">Terms &amp; Conditions</h1>
-    <p class="policy-body">
-        This page is coming soon. Our terms of service will outline how Spendly may be used,
-        your responsibilities as a user, and the limits of our liability. We'll keep it short and readable.
+    <p class="policy-meta">Last updated: June 2025</p>
+
+    <h2 class="policy-section-title">1. Acceptance of Terms</h2>
+    <p class="policy-section-body">
+        By accessing or using Spendly, you agree to be bound by these Terms &amp; Conditions.
+        If you do not agree with any part of these terms, please do not use the service.
+        Continued use of Spendly after any updates to these terms constitutes your acceptance of the revised version.
     </p>
-    <a href="{{ url_for('landing') }}" class="policy-back">← Back to home</a>
+
+    <h2 class="policy-section-title">2. Use of Service</h2>
+    <p class="policy-section-body">
+        Spendly is designed for personal expense tracking only. You agree not to misuse the platform —
+        including attempting to access other users' data, reverse-engineer the service, or use it for any
+        unlawful purpose. We reserve the right to suspend accounts that violate these terms.
+    </p>
+
+    <h2 class="policy-section-title">3. User Accounts</h2>
+    <p class="policy-section-body">
+        You are responsible for maintaining the confidentiality of your login credentials and for all
+        activity that occurs under your account. Please notify us immediately if you suspect any
+        unauthorised access. Spendly is not liable for any loss resulting from compromised credentials.
+    </p>
+
+    <h2 class="policy-section-title">4. Data &amp; Privacy</h2>
+    <p class="policy-section-body">
+        We collect expense data solely to provide and improve the Spendly service. We do not sell or
+        share your personal data with third parties for marketing purposes. For full details on how
+        your data is handled, please refer to our <a href="{{ url_for('privacy') }}" class="policy-back">Privacy Policy</a>.
+    </p>
+
+    <h2 class="policy-section-title">5. Limitation of Liability</h2>
+    <p class="policy-section-body">
+        Spendly provides tools to help you understand your spending — it does not offer financial advice.
+        We are not responsible for any financial decisions you make based on data or insights shown within
+        the app. Use the information as a guide, not as a substitute for professional financial counsel.
+    </p>
+
+    <h2 class="policy-section-title">6. Changes to Terms</h2>
+    <p class="policy-section-body">
+        We reserve the right to update these Terms &amp; Conditions at any time. When we do, we will
+        revise the "Last updated" date at the top of this page. We encourage you to review this page
+        periodically to stay informed of any changes.
+    </p>
+
+    <h2 class="policy-section-title">7. Contact</h2>
+    <p class="policy-section-body">
+        For questions or concerns about these terms, feel free to reach out to us at
+        <a href="mailto:support@spendly.com" class="policy-back">support@spendly.com</a>.
+    </p>
+
+    <a href="{{ url_for('landing') }}" class="policy-back" style="display:inline-block; margin-top: 2.5rem;">← Back to home</a>
 </div>
 {% endblock %}
