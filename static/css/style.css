@@ -49,6 +49,9 @@ body {
     font-size: 1rem;
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
 }
 
 a { color: inherit; text-decoration: none; }
@@ -117,7 +120,7 @@ a { color: inherit; text-decoration: none; }
 /* Main                                                                */
 /* ------------------------------------------------------------------ */
 
-.main-content { min-height: calc(100vh - 60px - 100px); }
+.main-content { flex: 1; }
 
 /* ------------------------------------------------------------------ */
 /* Hero                                                                */
@@ -483,8 +486,7 @@ a { color: inherit; text-decoration: none; }
 
 .footer {
     background: var(--ink);
-    color: var(--paper);
-    padding: 2.5rem 2rem;
+    padding: 3rem 2rem;
     text-align: center;
 }
 
@@ -492,46 +494,49 @@ a { color: inherit; text-decoration: none; }
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.4rem;
+    gap: 0.5rem;
 }
 
-.footer .brand-icon { color: var(--accent-2); font-size: 1.5rem; }
+.footer-icon {
+    color: var(--accent-2);
+    font-size: 1.6rem;
+    margin-bottom: 0.25rem;
+}
 
-.footer-name {
+.footer-brand {
+    color: var(--paper);
+    font-size: 1.1rem;
     font-weight: 600;
-    font-size: 1rem;
 }
 
-.footer-copy {
+.footer-tagline {
     font-size: 0.8rem;
-    color: var(--ink-faint);
+    color: var(--ink-muted);
+    margin-bottom: 0.75rem;
 }
 
-/* ------------------------------------------------------------------ */
-/* Landing footer (policy links)                                       */
-/* ------------------------------------------------------------------ */
-
-.landing-footer {
-    text-align: center;
-    padding: 1.25rem 2rem 2rem;
+.footer-nav {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: center;
-    gap: 0.6rem;
+    gap: 0.4rem;
+    margin-bottom: 0.75rem;
 }
 
-.landing-footer-link {
-    font-size: 0.8rem;
+.footer-link {
+    font-size: 0.875rem;
     color: var(--ink-faint);
     transition: color 0.2s;
 }
 
-.landing-footer-link:hover { color: var(--ink-muted); }
+.footer-link:hover {
+    color: var(--paper);
+    text-decoration: underline;
+}
 
-.landing-footer-sep {
-    font-size: 0.8rem;
-    color: var(--ink-faint);
-    user-select: none;
+.footer-copy {
+    font-size: 0.75rem;
+    color: var(--ink-muted);
 }
 
 /* ------------------------------------------------------------------ */
