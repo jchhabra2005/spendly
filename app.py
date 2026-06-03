@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 from collections import defaultdict
+from functools import wraps
 import time
 from database.db import (
     init_db, seed_dummy_data,
@@ -27,6 +28,15 @@ def _is_rate_limited(ip):
 
 def _record_failed_login(ip):
     _login_attempts[request.remote_addr].append(time.time())
+
+
+def login_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        if "user_id" not in session:
+            return redirect(url_for("login"))
+        return f(*args, **kwargs)
+    return decorated
 
 
 # ------------------------------------------------------------------ #
@@ -88,15 +98,15 @@ def terms():
 # ------------------------------------------------------------------ #
 
 @app.route("/logout")
+@login_required
 def logout():
     session.clear()
     return redirect(url_for("login"))
 
 
 @app.route("/profile", methods=["GET", "POST"])
+@login_required
 def profile():
-    if "user_id" not in session:
-        return redirect(url_for("login"))
     user = get_user_by_id(session["user_id"])
     if request.method == "POST":
         old_pw = request.form.get("current_password", "")
@@ -110,9 +120,8 @@ def profile():
 
 
 @app.route("/dashboard")
+@login_required
 def dashboard():
-    if "user_id" not in session:
-        return redirect(url_for("login"))
     user_id = session["user_id"]
     result  = get_expenses(user_id)
     summary = get_expense_summary(user_id)
@@ -122,9 +131,8 @@ def dashboard():
 
 
 @app.route("/expenses")
+@login_required
 def expenses():
-    if "user_id" not in session:
-        return redirect(url_for("login"))
     user_id = session["user_id"]
     page = request.args.get("page", 1, type=int)
     filters = {k: v for k, v in {
@@ -141,9 +149,8 @@ def expenses():
 
 
 @app.route("/expenses/add", methods=["GET", "POST"])
+@login_required
 def add_expense():
-    if "user_id" not in session:
-        return redirect(url_for("login"))
     user_id    = session["user_id"]
     categories = get_categories(user_id)
     if request.method == "POST":
@@ -166,9 +173,8 @@ def add_expense():
 
 
 @app.route("/expenses/<int:id>/edit", methods=["GET", "POST"])
+@login_required
 def edit_expense(id):
-    if "user_id" not in session:
-        return redirect(url_for("login"))
     user_id = session["user_id"]
     expense = get_expense_by_id(id, user_id)
     if expense is None:
@@ -194,17 +200,15 @@ def edit_expense(id):
 
 
 @app.route("/expenses/<int:id>/delete", methods=["POST"])
+@login_required
 def expense_delete(id):
-    if "user_id" not in session:
-        return redirect(url_for("login"))
     delete_expense(id, session["user_id"])
     return redirect(url_for("dashboard"))
 
 
 @app.route("/categories", methods=["GET", "POST"])
+@login_required
 def categories():
-    if "user_id" not in session:
-        return redirect(url_for("login"))
     user_id = session["user_id"]
     if request.method == "POST":
         name = request.form.get("name", "").strip()
@@ -226,9 +230,8 @@ def categories():
 
 
 @app.route("/categories/<int:id>/delete", methods=["POST"])
+@login_required
 def category_delete(id):
-    if "user_id" not in session:
-        return redirect(url_for("login"))
     delete_category(id, session["user_id"])
     return redirect(url_for("categories"))
 
