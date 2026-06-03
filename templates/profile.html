@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}Profile — Spendly{% endblock %}
+
+{% block content %}
+<section class="auth-section">
+    <div class="auth-container">
+
+        <div class="auth-header">
+            <h1 class="auth-title">Your Profile</h1>
+            <p class="auth-subtitle">{{ user.email }}</p>
+        </div>
+
+        <div class="auth-card">
+            {% if error %}
+            <div class="auth-error">{{ error }}</div>
+            {% endif %}
+            {% if success %}
+            <div class="auth-error" style="background:#e8f5e9;border-color:#a5d6a7;color:var(--accent);">{{ success }}</div>
+            {% endif %}
+
+            <p style="margin-bottom:1.2rem;font-size:.95rem;color:#444;">
+                <strong>Name:</strong> {{ user.name or '—' }}<br>
+                <strong>Email:</strong> {{ user.email }}<br>
+                <strong>Member since:</strong> {{ user.created_at[:10] }}
+            </p>
+
+            <h2 style="font-size:1.1rem;margin-bottom:1rem;">Change Password</h2>
+            <form method="POST" action="{{ url_for('profile') }}">
+                <div class="form-group">
+                    <label for="current_password">Current password</label>
+                    <input type="password" id="current_password" name="current_password"
+                           class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label for="new_password">New password</label>
+                    <input type="password" id="new_password" name="new_password"
+                           class="form-input" placeholder="Min. 8 characters" required>
+                </div>
+                <button type="submit" class="btn-submit">Update password</button>
+            </form>
+        </div>
+
+        <p class="auth-switch">
+            <a href="{{ url_for('dashboard') }}">&larr; Back to dashboard</a>
+        </p>
+
+    </div>
+</section>
+{% endblock %}

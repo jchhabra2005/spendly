@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard — Spendly{% endblock %}
+
+{% block head %}
+<style>
+    .dashboard-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 2rem;
+    }
+    .dashboard-title { font-family: var(--font-display); font-size: 2rem; color: var(--ink); }
+    .btn-add {
+        background: var(--accent); color: #fff; padding: 0.6rem 1.2rem;
+        border-radius: var(--radius); text-decoration: none; font-weight: 500;
+        font-size: 0.95rem;
+    }
+    .btn-add:hover { opacity: 0.88; }
+    .summary-grid {
+        display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 1rem; margin-bottom: 2rem;
+    }
+    .stat-card {
+        background: var(--paper); border: 1px solid var(--border);
+        border-radius: var(--radius); padding: 1.2rem 1.4rem;
+    }
+    .stat-label { font-size: 0.8rem; color: #666; text-transform: uppercase; letter-spacing: .04em; }
+    .stat-value { font-size: 1.6rem; font-weight: 600; color: var(--ink); margin-top: .25rem; }
+    .expense-table { width: 100%; border-collapse: collapse; }
+    .expense-table th {
+        text-align: left; padding: 0.7rem 1rem; font-size: 0.8rem;
+        text-transform: uppercase; letter-spacing: .04em; color: #666;
+        border-bottom: 1px solid var(--border);
+    }
+    .expense-table td { padding: 0.85rem 1rem; border-bottom: 1px solid var(--border); font-size: 0.95rem; }
+    .expense-table tr:last-child td { border-bottom: none; }
+    .badge {
+        display: inline-block; padding: 0.2rem 0.6rem; border-radius: 999px;
+        background: #e8f5e9; color: var(--accent); font-size: 0.78rem; font-weight: 500;
+    }
+    .action-link { color: var(--accent); text-decoration: none; font-size: 0.88rem; margin-right: 0.5rem; }
+    .action-delete { color: var(--danger); background: none; border: none; cursor: pointer; font-size: 0.88rem; }
+    .table-card { background: var(--paper); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+    .empty-state { text-align: center; padding: 3rem; color: #888; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width:960px;margin:2rem auto;padding:0 1.5rem;">
+
+    <div class="dashboard-header">
+        <h1 class="dashboard-title">Welcome, {{ user.name or user.email }}</h1>
+        <a href="{{ url_for('add_expense') }}" class="btn-add">+ Add Expense</a>
+    </div>
+
+    {% if summary %}
+    <div class="summary-grid">
+        {% set ns = namespace(grand_total=0) %}
+        {% for row in summary %}{% set ns.grand_total = ns.grand_total + row.total %}{% endfor %}
+        <div class="stat-card">
+            <div class="stat-label">Total Spent</div>
+            <div class="stat-value">₹{{ "%.0f"|format(ns.grand_total) }}</div>
+        </div>
+        {% for row in summary[:3] %}
+        <div class="stat-card">
+            <div class="stat-label">{{ row.category }}</div>
+            <div class="stat-value">₹{{ "%.0f"|format(row.total) }}</div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="table-card">
+        {% if expenses %}
+        <table class="expense-table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Category</th>
+                    <th>Note</th>
+                    <th>Amount</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for e in expenses %}
+                <tr>
+                    <td>{{ e.date }}</td>
+                    <td><span class="badge">{{ e.category_name }}</span></td>
+                    <td>{{ e.description or '—' }}</td>
+                    <td>₹{{ "%.2f"|format(e.amount) }}</td>
+                    <td>
+                        <a href="{{ url_for('edit_expense', id=e.id) }}" class="action-link">Edit</a>
+                        <form method="POST" action="{{ url_for('expense_delete', id=e.id) }}" style="display:inline;">
+                            <button type="submit" class="action-delete"
+                                    onclick="return confirm('Delete this expense?')">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty-state">
+            <p>No expenses yet. <a href="{{ url_for('add_expense') }}">Add your first one.</a></p>
+        </div>
+        {% endif %}
+    </div>
+
+    {% if total > 20 %}
+    <p style="margin-top:1rem;font-size:.9rem;color:#666;">
+        Showing 20 of {{ total }} expenses.
+        <a href="{{ url_for('expenses') }}">View all</a>
+    </p>
+    {% endif %}
+
+</div>
+{% endblock %}

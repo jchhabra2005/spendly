@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Categories — Spendly{% endblock %}
+
+{% block head %}
+<style>
+    .cat-list { list-style: none; padding: 0; margin: 0 0 1.5rem; }
+    .cat-item {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 0.75rem 1rem; border-bottom: 1px solid var(--border);
+    }
+    .cat-item:last-child { border-bottom: none; }
+    .cat-name { font-size: 0.95rem; }
+    .cat-default { font-size: 0.75rem; color: #888; margin-left: 0.5rem; }
+    .cat-delete { color: var(--danger); background: none; border: none; cursor: pointer; font-size: 0.85rem; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width:600px;margin:2rem auto;padding:0 1.5rem;">
+
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;">
+        <h1 style="font-family:var(--font-display);font-size:1.8rem;">Categories</h1>
+        <a href="{{ url_for('dashboard') }}" style="font-size:.9rem;color:var(--accent);">&larr; Dashboard</a>
+    </div>
+
+    <div style="background:var(--paper);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:2rem;">
+        {% if error %}
+        <div class="auth-error" style="margin:1rem;">{{ error }}</div>
+        {% endif %}
+
+        <ul class="cat-list">
+            {% for cat in categories %}
+            <li class="cat-item">
+                <span class="cat-name">
+                    {{ cat.name }}
+                    {% if cat.is_default %}<span class="cat-default">(default)</span>{% endif %}
+                </span>
+                {% if not cat.is_default %}
+                <form method="POST" action="{{ url_for('category_delete', id=cat.id) }}" style="display:inline;">
+                    <button type="submit" class="cat-delete"
+                            onclick="return confirm('Delete this category? Expenses will move to Other.')">
+                        Remove
+                    </button>
+                </form>
+                {% endif %}
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div style="background:var(--paper);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;">
+        <h2 style="font-size:1.05rem;margin-bottom:1rem;">Add Custom Category</h2>
+        <form method="POST" action="{{ url_for('categories') }}">
+            <div class="form-group">
+                <label for="name">Category name</label>
+                <input type="text" id="name" name="name" class="form-input"
+                       placeholder="e.g. Subscriptions" maxlength="80" required>
+            </div>
+            <button type="submit" class="btn-submit">Add category</button>
+        </form>
+    </div>
+
+</div>
+{% endblock %}
