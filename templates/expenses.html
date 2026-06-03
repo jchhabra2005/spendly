@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block title %}Expenses — Spendly{% endblock %}
+
+{% block head %}
+<style>
+    .expense-table { width: 100%; border-collapse: collapse; }
+    .expense-table th {
+        text-align: left; padding: 0.7rem 1rem; font-size: 0.8rem;
+        text-transform: uppercase; letter-spacing: .04em; color: #666;
+        border-bottom: 1px solid var(--border);
+    }
+    .expense-table td { padding: 0.85rem 1rem; border-bottom: 1px solid var(--border); font-size: 0.95rem; }
+    .expense-table tr:last-child td { border-bottom: none; }
+    .badge {
+        display: inline-block; padding: 0.2rem 0.6rem; border-radius: 999px;
+        background: #e8f5e9; color: var(--accent); font-size: 0.78rem; font-weight: 500;
+    }
+    .filter-row { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+    .filter-row input, .filter-row select {
+        padding: 0.45rem 0.75rem; border: 1px solid var(--border); border-radius: var(--radius);
+        font-size: 0.9rem; background: var(--paper); color: var(--ink);
+    }
+    .pagination { display: flex; gap: 0.5rem; margin-top: 1.2rem; }
+    .page-link {
+        padding: 0.4rem 0.8rem; border: 1px solid var(--border); border-radius: var(--radius);
+        text-decoration: none; font-size: 0.9rem; color: var(--ink);
+    }
+    .page-link.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width:960px;margin:2rem auto;padding:0 1.5rem;">
+
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;">
+        <h1 style="font-family:var(--font-display);font-size:1.8rem;">All Expenses</h1>
+        <a href="{{ url_for('add_expense') }}" style="background:var(--accent);color:#fff;padding:.55rem 1.1rem;border-radius:var(--radius);text-decoration:none;font-weight:500;font-size:.9rem;">+ Add</a>
+    </div>
+
+    <form method="GET" action="{{ url_for('expenses') }}">
+        <div class="filter-row">
+            <input type="text" name="date_from" placeholder="From (DD-MM-YYYY)"
+                   value="{{ filters.get('date_from', '') }}">
+            <input type="text" name="date_to" placeholder="To (DD-MM-YYYY)"
+                   value="{{ filters.get('date_to', '') }}">
+            <select name="category_id">
+                <option value="">All categories</option>
+                {% for cat in categories %}
+                <option value="{{ cat.id }}"
+                    {% if filters.get('category_id')|string == cat.id|string %}selected{% endif %}>
+                    {{ cat.name }}
+                </option>
+                {% endfor %}
+            </select>
+            <input type="number" name="amount_min" placeholder="Min ₹"
+                   step="0.01" value="{{ filters.get('amount_min', '') }}">
+            <input type="number" name="amount_max" placeholder="Max ₹"
+                   step="0.01" value="{{ filters.get('amount_max', '') }}">
+            <button type="submit" style="background:var(--accent);color:#fff;border:none;padding:.45rem .9rem;border-radius:var(--radius);cursor:pointer;font-size:.9rem;">Filter</button>
+            <a href="{{ url_for('expenses') }}" style="padding:.45rem .9rem;border:1px solid var(--border);border-radius:var(--radius);font-size:.9rem;text-decoration:none;color:var(--ink);">Clear</a>
+        </div>
+    </form>
+
+    <div style="background:var(--paper);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;">
+        {% if items %}
+        <table class="expense-table">
+            <thead>
+                <tr>
+                    <th>Date</th><th>Category</th><th>Note</th><th>Amount</th><th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for e in items %}
+                <tr>
+                    <td>{{ e.date }}</td>
+                    <td><span class="badge">{{ e.category_name }}</span></td>
+                    <td>{{ e.description or '—' }}</td>
+                    <td>₹{{ "%.2f"|format(e.amount) }}</td>
+                    <td>
+                        <a href="{{ url_for('edit_expense', id=e.id) }}"
+                           style="color:var(--accent);font-size:.88rem;margin-right:.5rem;">Edit</a>
+                        <form method="POST" action="{{ url_for('expense_delete', id=e.id) }}" style="display:inline;">
+                            <button type="submit"
+                                    style="color:var(--danger);background:none;border:none;cursor:pointer;font-size:.88rem;"
+                                    onclick="return confirm('Delete this expense?')">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div style="text-align:center;padding:3rem;color:#888;">No expenses found.</div>
+        {% endif %}
+    </div>
+
+    {% if pages > 1 %}
+    <div class="pagination">
+        {% for p in range(1, pages + 1) %}
+        <a href="{{ url_for('expenses', page=p, **filters) }}"
+           class="page-link {% if p == page %}active{% endif %}">{{ p }}</a>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <p style="margin-top:.75rem;font-size:.85rem;color:#888;">{{ total }} expense{{ 's' if total != 1 }}</p>
+
+</div>
+{% endblock %}
